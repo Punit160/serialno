@@ -38,7 +38,7 @@ function Login() {
     try {
       setLoading(true);
       const response = await axios.post(
-        "http://localhost:3000/api/login/loginuser",
+        `${process.env.BACKEND_API_URL}login/loginuser`,
         { email, password }
       );
 

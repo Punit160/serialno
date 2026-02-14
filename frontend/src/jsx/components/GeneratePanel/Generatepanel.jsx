@@ -41,7 +41,7 @@ const handleSubmit = async (e) => {
 
   try {
     const res = await axios.post(
-      "http://localhost:3000/api/panels/create-panel-serial",
+      `${process.env.BACKEND_API_URL}panels/create-panel-serial`,
       payload,
       {
         headers: {
@@ -50,7 +50,7 @@ const handleSubmit = async (e) => {
       }
     );
 
-    alert("Serial numbers generated successfully");
+  alert("Serial numbers generated successfully");
   } catch (error) {
   console.log("ERROR:", error?.response?.data);
   alert(error?.response?.data?.message || "Failed to generate");

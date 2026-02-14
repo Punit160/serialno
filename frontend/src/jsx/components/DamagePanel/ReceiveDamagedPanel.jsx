@@ -2,8 +2,6 @@ import { Fragment, useState, useRef, useEffect } from "react";
 import PageTitle from "../../layouts/PageTitle";
 import jsQR from "jsqr";
 
-const API_BASE = "http://localhost:3000/api"; // change here only when deploying
-
 const ReceivePanel = () => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -165,7 +163,7 @@ const handleSubmit = async (e) => {
       formData.append("image", image);
 
       const response = await fetch(
-        `${API_BASE}/damage/create-damage-panel`,
+        `${process.env.BACKEND_API_URL}damage/create-damage-panel`,
         {
           method: "POST",
           headers: {

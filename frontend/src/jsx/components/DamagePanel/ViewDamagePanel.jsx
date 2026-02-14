@@ -21,14 +21,14 @@ const ViewDamagePanel = () => {
         const token = localStorage.getItem("token");
 
         const senderRes = await fetch(
-          `${API_BASE}/damage/get-damage-panel`,
+          `${process.env.BACKEND_API_URL}damage/get-damage-panel`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
 
         const receiverRes = await fetch(
-          `${API_BASE}/damage/get-damage-panel-onsite`,
+          `${process.env.BACKEND_API_URL}damage/get-damage-panel-onsite`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }

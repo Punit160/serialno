@@ -138,7 +138,7 @@ const handleSubmit = async (e) => {
       }
 
       const res = await fetch(
-        "http://localhost:3000/api/damage/create-damage-panel",
+        `${process.env.BACKEND_API_URL}damage/create-damage-panel`,
         {
           method: "POST",
           headers: {
