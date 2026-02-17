@@ -347,7 +347,14 @@ const Header = ({ onNote }) => {
                   role="button"
                   data-toggle="dropdown"
                 >
-                  <img src={profile} width={50} alt="" className="bg-light" />
+                  <img
+                    src={profile}
+                    width="50"
+                    height="50"
+                    alt="profile"
+                    className="rounded-circle object-fit-cover"
+                  />
+
 
                 </Dropdown.Toggle>
 
@@ -371,7 +378,7 @@ const Header = ({ onNote }) => {
                     </svg>
                     <span className="ms-2">Profile </span>
                   </Link>
-                
+
                   <LogoutPage />
 
                 </Dropdown.Menu>
