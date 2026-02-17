@@ -120,7 +120,7 @@ const DispatchPanel = () => {
       console.log("TOKEN:", localStorage.getItem("token"));
 
       await axios.post(
-        `${process.env.BACKEND_API_URL}dispatch/scan-panel`,
+        `${import.meta.env.VITE_BACKEND_API_URL}dispatch/scan-panel`,
         {
           panel_no: panelCode,
           dispatch_id,
@@ -187,7 +187,7 @@ const DispatchPanel = () => {
       };
 
      const res = await axios.post(
-  `${process.env.BACKEND_API_URL}dispatch/create-dispatch-panel`,
+  `${import.meta.env.VITE_BACKEND_API_URL}dispatch/create-dispatch-panel`,
   payload,
   {
     headers: {

@@ -41,7 +41,7 @@ const handleSubmit = async (e) => {
 
   try {
     const res = await axios.post(
-      `${process.env.BACKEND_API_URL}panels/create-panel-serial`,
+      `${import.meta.env.VITE_BACKEND_API_URL}panels/create-panel-serial`,
       payload,
       {
         headers: {

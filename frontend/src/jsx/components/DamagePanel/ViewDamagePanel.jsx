@@ -4,8 +4,6 @@ import { Link } from "react-router-dom";
 import TableExportActions from "../Common/TableExportActions";
 import PropTypes from "prop-types";
 
-const API_BASE = "http://localhost:3000/api";
-const IMAGE_BASE = "http://localhost:3000/";
 
 const ViewDamagePanel = () => {
   
@@ -21,14 +19,14 @@ const ViewDamagePanel = () => {
         const token = localStorage.getItem("token");
 
         const senderRes = await fetch(
-          `${process.env.BACKEND_API_URL}damage/get-damage-panel`,
+          `${import.meta.env.VITE_BACKEND_API_URL}damage/get-damage-panel`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
 
         const receiverRes = await fetch(
-          `${process.env.BACKEND_API_URL}damage/get-damage-panel-onsite`,
+          `${import.meta.env.VITE_BACKEND_API_URL}damage/get-damage-panel-onsite`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }

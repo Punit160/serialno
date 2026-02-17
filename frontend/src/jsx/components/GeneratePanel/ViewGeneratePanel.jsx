@@ -16,7 +16,7 @@ const ViewGeneratePanel = () => {
 
     const fetchLots = async () => {
         try {
-            const res = await axios.get(`${process.env.BACKEND_API_URL}panels/panels/all-panel-serial`, {
+            const res = await axios.get(`${import.meta.env.VITE_BACKEND_API_URL}panels/all-panel-serial`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

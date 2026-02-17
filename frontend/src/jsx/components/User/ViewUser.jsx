@@ -15,7 +15,7 @@ const ViewUser = () => {
       const token = localStorage.getItem("token");
 
       const res = await axios.get(
-        "http://localhost:3000/api/users/user-list",
+        `${import.meta.env.VITE_BACKEND_API_URL}users/user-list`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

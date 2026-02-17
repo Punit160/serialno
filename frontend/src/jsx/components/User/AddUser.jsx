@@ -68,7 +68,7 @@ const AddUser = () => {
       }
 
       await axios.post(
-        "http://localhost:3000/api/users/create-user",
+        `${import.meta.env.VITE_BACKEND_API_URL}users/create-user`,
         data,
         {
           headers: {

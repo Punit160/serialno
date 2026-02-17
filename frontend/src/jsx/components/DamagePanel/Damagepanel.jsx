@@ -138,7 +138,7 @@ const handleSubmit = async (e) => {
       }
 
       const res = await fetch(
-        `${process.env.BACKEND_API_URL}damage/create-damage-panel`,
+        `${import.meta.env.VITE_BACKEND_API_URL}damage/create-damage-panel`,
         {
           method: "POST",
           headers: {

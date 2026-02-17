@@ -38,7 +38,7 @@ function Login() {
     try {
       setLoading(true);
       const response = await axios.post(
-        `${process.env.BACKEND_API_URL}login/loginuser`,
+        `${import.meta.env.VITE_BACKEND_API_URL}login/loginuser`,
         { email, password }
       );
 
