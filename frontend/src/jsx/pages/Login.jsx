@@ -145,7 +145,7 @@ function Login() {
                       </form>
 
                       <div className="new-account mt-2">
-                        <p>Don't have an account? <Link className="text-primary" to="/page-register">Sign up</Link></p>
+                        <p>Don&apos;t have an account? <Link className="text-primary" to="/page-register">Sign up</Link></p>
                       </div>
 
                     </div>
