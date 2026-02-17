@@ -136,7 +136,7 @@ const getPanelType = (item) => {
 
               <td>
                 <img
-                  src={`${IMAGE_BASE}${item.image}`}
+                  src={`${import.meta.env.VITE_BACKEND_URL}${item.image}`}
                   alt="damage"
                   width="50"
                   height="50"
