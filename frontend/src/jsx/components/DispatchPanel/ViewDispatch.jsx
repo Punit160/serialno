@@ -1,12 +1,14 @@
-import { useState } from "react";
-import { Card, Col, Table, Badge, Nav, Tab } from "react-bootstrap";
+import { useState, useEffect } from "react";
+import { Card, Col, Table, Badge } from "react-bootstrap";
 import TableExportActions from "../Common/TableExportActions";
 import ScannedPanelsModal from "./ScannedPanelsModal";
-import PropTypes from "prop-types";
+import axios from "axios";
 
 const ViewDispatchPanel = () => {
+
     /* ================= STATE ================= */
 
+    const [dispatchList, setDispatchList] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [selectedDispatch, setSelectedDispatch] = useState(null);
 
@@ -20,45 +22,33 @@ const ViewDispatchPanel = () => {
         setSelectedDispatch(null);
     };
 
-    /* ================= MOCK DATA ================= */
+    /* ================= FETCH API ================= */
 
-    const dispatchList = [
-        {
-            id: 1,
-            date: "22 Jan 2026",
-            state: "Uttar Pradesh",
-            truckNo: "UP16 AB 2345",
-            driverName: "Ramesh",
-            driverNo: "9876543210",
-            dispatchType: "DCR",
-            dcrScannedPanels: [
-                "DCR-PNL-001",
-                "DCR-PNL-002",
-                "DCR-PNL-003",
-            ],
-            isCompleted: "Completed",
-        },
-        {
-            id: 2,
-            date: "23 Jan 2026",
-            state: "Haryana",
-            truckNo: "HR26 CD 8899",
-            driverName: "Suresh",
-            driverNo: "9123456780",
-            dispatchType: "NON_DCR",
-            nonDcrScannedPanels: [
-                "NDCR-PNL-101",
-                "NDCR-PNL-102",
-                "NDCR-PLN-202",
-            ],
-            isCompleted: "Pending",
-        },
-    ];
+    const fetchDispatchPanels = async () => {
+        try {
+            const token = localStorage.getItem("token");
 
-    /* ================= FILTER ================= */
+            const res = await axios.get(
+                `${import.meta.env.VITE_BACKEND_API_URL}dispatch/fetch-all-dispatch-panel`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
 
-    const dcrList = dispatchList.filter((i) => i.dispatchType === "DCR");
-    const nonDcrList = dispatchList.filter((i) => i.dispatchType === "NON_DCR");
+            console.log("Dispatch API:", res.data);
+
+            setDispatchList(res.data.data || res.data || []);
+
+        } catch (error) {
+            console.log("Dispatch API Error:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchDispatchPanels();
+    }, []);
 
     /* ================= EXPORT ================= */
 
@@ -71,8 +61,8 @@ const ViewDispatchPanel = () => {
         dispatchType: item.dispatchType,
         scannedPanels:
             item.dispatchType === "DCR"
-                ? item.dcrScannedPanels.length
-                : item.nonDcrScannedPanels.length,
+                ? item.dcrScannedPanels?.length || 0
+                : item.nonDcrScannedPanels?.length || 0,
         status: item.isCompleted,
     }));
 
@@ -87,98 +77,15 @@ const ViewDispatchPanel = () => {
         { label: "Status", key: "status" },
     ];
 
-    /* ================= TABLE COMPONENT ================= */
-
-    const DispatchTable = ({ data, type }) => (
-        <Table responsive className="table-hover align-middle">
-            <thead>
-                <tr>
-                    <th>S No.</th>
-                    <th>Date</th>
-                    <th>State</th>
-                    <th>Truck No</th>
-                    <th>Driver</th>
-                    <th>Type</th>
-                    <th>Scanned</th>
-                    <th>Status</th>
-                    <th className="text-center">Action</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                {data.length > 0 ? (
-                    data.map((item, index) => (
-                        <tr key={item.id}>
-                            <td>{index + 1}</td>
-                            <td>{item.date}</td>
-                            <td>{item.state}</td>
-                            <td>{item.truckNo}</td>
-
-                            <td>
-                                <strong>{item.driverName}</strong>
-                                <br />
-                                <small>{item.driverNo}</small>
-                            </td>
-
-                            <td>
-                                <Badge bg="primary">{type}</Badge>
-                            </td>
-
-                            <td>
-                                <strong>
-                                    {type === "DCR"
-                                        ? item.dcrScannedPanels.length
-                                        : item.nonDcrScannedPanels.length}
-                                </strong>
-                            </td>
-
-                            <td>
-                                <Badge
-                                    bg={item.isCompleted === "Completed" ? "success" : "warning"}
-                                >
-                                    {item.isCompleted}
-                                </Badge>
-                            </td>
-
-                            <td className="text-center">
-                                <button
-                                    className="btn btn-primary btn-xs sharp me-2"
-                                    onClick={() => openModal(item)}
-                                >
-                                    <i className="fa fa-eye" />
-                                </button>
-
-                                <button className="btn btn-danger btn-xs sharp">
-                                    <i className="fa fa-trash" />
-                                </button>
-                            </td>
-                        </tr>
-                    ))
-                ) : (
-                    <tr>
-                        <td colSpan="9" className="text-center text-muted">
-                            No dispatch records found
-                        </td>
-                    </tr>
-                )}
-            </tbody>
-        </Table>
-    );
-
-    /* ================= PROP TYPES FIX ================= */
-
-    DispatchTable.propTypes = {
-        data: PropTypes.array.isRequired,
-        type: PropTypes.string.isRequired,
-    };
-
     /* ================= UI ================= */
 
     return (
         <Col lg={12}>
             <Card>
-                <Card.Header className="d-flex justify-content-between">
-                    <Card.Title>Dispatch Panel List</Card.Title>
+                <Card.Header className="d-flex justify-content-between align-items-center">
+                    <Card.Title className="mb-0">
+                        Dispatch Panel List
+                    </Card.Title>
 
                     <TableExportActions
                         data={exportData}
@@ -188,35 +95,67 @@ const ViewDispatchPanel = () => {
                 </Card.Header>
 
                 <Card.Body>
-                    <Tab.Container defaultActiveKey="dcr">
-                        <Nav variant="pills" className="mb-4">
-                            <Nav.Item>
-                                <Nav.Link eventKey="dcr">
-                                    DCR Dispatch ({dcrList.length})
-                                </Nav.Link>
-                            </Nav.Item>
+                    <Table responsive className="table-hover align-middle">
+                      <thead>
+                            <tr>
+                                <th>S No.</th>
+                                <th>Dispatch ID</th>
+                                <th>Truck No</th>
+                                <th>Challan No</th>
+                                <th>Driver</th>
+                                <th>Panel Count</th>
+                                <th className="text-center">Action</th>
+                            </tr>
+                            </thead>
+                       <tbody>
+  {dispatchList.length > 0 ? (
+    dispatchList.map((item, index) => (
+      <tr key={item._id}>
+        <td><strong>{index + 1}</strong></td>
 
-                            <Nav.Item>
-                                <Nav.Link eventKey="non_dcr">
-                                    NON-DCR Dispatch ({nonDcrList.length})
-                                </Nav.Link>
-                            </Nav.Item>
-                        </Nav>
+        <td>{item.dispatch_id}</td>
 
-                        <Tab.Content>
-                            <Tab.Pane eventKey="dcr">
-                                <DispatchTable data={dcrList} type="DCR" />
-                            </Tab.Pane>
+        <td>{item.truck_no}</td>
 
-                            <Tab.Pane eventKey="non_dcr">
-                                <DispatchTable data={nonDcrList} type="NON_DCR" />
-                            </Tab.Pane>
-                        </Tab.Content>
-                    </Tab.Container>
+        <td>{item.challan_no}</td>
+
+        <td>
+          <strong>{item.driver_name}</strong>
+          <br />
+          <small>{item.driver_no}</small>
+        </td>
+
+        <td>
+          <strong>{item.dispatch_panel_count}</strong>
+        </td>
+
+        <td className="text-center">
+          <button
+            className="btn btn-primary btn-xs sharp me-2"
+            onClick={() => openModal(item)}
+          >
+            <i className="fa fa-eye" />
+          </button>
+
+          <button className="btn btn-danger btn-xs sharp">
+            <i className="fa fa-trash" />
+          </button>
+        </td>
+      </tr>
+    ))
+  ) : (
+    <tr>
+      <td colSpan="7" className="text-center text-muted">
+        No dispatch records found
+      </td>
+    </tr>
+  )}
+</tbody>
+
+                    </Table>
                 </Card.Body>
             </Card>
 
-            {/* ===== MODAL ===== */}
             <ScannedPanelsModal
                 show={showModal}
                 onHide={closeModal}

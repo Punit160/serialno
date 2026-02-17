@@ -1,12 +1,6 @@
 import mongoose from "mongoose";
 
 const ProductionPanelSchema = new mongoose.Schema({
-    unique_id: {
-    type: Number,
-    required: true,
-    unique: true,
-    index: true
-    },
     company_id: {
       type: String,
       required: true,

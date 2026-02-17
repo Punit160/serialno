@@ -80,6 +80,23 @@ export const MenuList = [
     ],
 },
 
+// Production
+{
+    title: 'Production',
+    classsChange: 'mm-collapse',
+    iconStyle: <i className="fa-solid fa-industry fw-bold" />,
+    content: [
+        {
+            title: 'Add Production',
+            to: 'production/add',
+        },
+        {
+            title: 'View Production List',
+            to: 'production/list',
+        },
+    ],
+},
+
 
 // Dispatch Panel
 {

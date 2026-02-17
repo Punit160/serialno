@@ -18,10 +18,11 @@ app.use(express.json())
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "http://klkventures.cloud"],
     credentials: true,
   })
 );
+
 
 // Configure session
 app.use(session({

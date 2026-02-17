@@ -55,7 +55,7 @@ export const createDamagePanel = async (req, res) => {
     }
 
     // 2️⃣ Handle image
-    const imagePath = req.file ? req.file.path : "";
+   const imagePath = req.file ? `uploads/${req.file.filename}` : "";
 
     const savedDamages = [];
 

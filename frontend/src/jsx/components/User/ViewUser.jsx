@@ -79,17 +79,17 @@ const ViewUser = () => {
 
                       {/* Profile Image */}
                       <td>
-                        <img
-                          src={
-                            user.emp_image
-                              ? `http://localhost:3000/uploads/${user.emp_image}`
-                              : "https://via.placeholder.com/45"
-                          }
-                          alt="User"
-                          width="45"
-                          height="45"
-                          className="rounded-circle border"
-                        />
+                    <img
+                      src={
+                        user.emp_image
+                          ? `${import.meta.env.VITE_BACKEND_URL}/uploads/${user.emp_image}`
+                          : "https://via.placeholder.com/45"
+                      }
+                      alt="User"
+                      width="45"
+                      height="45"
+                      className="rounded-circle border"
+                    />
                       </td>
 
                       {/* Name */}
