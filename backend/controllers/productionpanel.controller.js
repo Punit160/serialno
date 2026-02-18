@@ -15,23 +15,38 @@ export const createProductionPanel = async (req, res) => {
       created_by,
     } = req.body;
 
-    /* ===============================
-       1️⃣ AUTO-GENERATE unique_id
-    =============================== */
-    const lastProduction = await ProductionPanel.findOne()
-      .sort({ unique_id: -1 })
-      .select("unique_id");
+    const count = Number(panel_count);
 
-    const nextUniqueId = lastProduction ? lastProduction.unique_id + 1 : 1;
+    if (!company_id || !panel_capacity || !panel_type || !project || !state || !date) {
+      return res.status(400).json({
+        success: false,
+        message: "All required fields must be provided",
+      });
+    }
 
-    /* ===============================
-       2️⃣ CREATE PRODUCTION LOT
-    =============================== */
+    /* FETCH PANELS FIRST */
+    const panels = await PanelNumber.find({
+      production_status: 0,
+      panel_capacity: panel_capacity,
+      panel_category : panel_type
+    })
+      .sort({ createdAt: 1 })
+      .limit(count);
+
+    console.log("Panels Found:", panels.length);
+
+    if (panels.length < count) {
+      return res.status(400).json({
+        success: false,
+        message: "Not enough panels available",
+      });
+    }
+
+    /* CREATE PRODUCTION */
     const productionPanel = await ProductionPanel.create({
-      unique_id: nextUniqueId,
       company_id,
       panel_capacity,
-      panel_count,
+      panel_count: count,
       panel_type,
       project,
       state,
@@ -39,50 +54,31 @@ export const createProductionPanel = async (req, res) => {
       created_by,
     });
 
-    /* ===============================
-       3️⃣ FETCH AVAILABLE PANELS
-    =============================== */
-    const panels = await PanelNumber.find({
-      production_status: 0, // not used
-      panel_capacity,
-    })
-      .sort({ unique_id: 1 }) // FIFO (important)
-      .limit(panel_count);
-
-    if (panels.length < panel_count) {
-      return res.status(400).json({
-        success: false,
-        message: "Not enough panels available",
-      });
-    }
-
     const panelIds = panels.map((p) => p._id);
 
-    /* ===============================
-       4️⃣ ASSIGN PANELS TO PRODUCTION
-    =============================== */
-    await PanelNumber.updateMany(
+    /* UPDATE PANELS */
+    const result = await PanelNumber.updateMany(
       { _id: { $in: panelIds } },
       {
         $set: {
           production_id: productionPanel._id,
-          production_lot_size: panel_count,
+          production_lot_size: count,
           production_status: 1,
         },
       }
     );
 
-    /* ===============================
-       5️⃣ RESPONSE
-    =============================== */
+    console.log("Updated Panels:", result.modifiedCount);
+
     res.status(201).json({
       success: true,
       message: "Production panel created successfully",
       data: {
-        production_unique_id: nextUniqueId,
-        assigned_panels: panelIds.length,
+        production_id: productionPanel._id,
+        assigned_panels: result.modifiedCount,
       },
     });
+
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -90,6 +86,8 @@ export const createProductionPanel = async (req, res) => {
     });
   }
 };
+
+
 
 export const fetchAllProductionPanels = async (req, res) => {
   try {

@@ -23,6 +23,7 @@
     "datatables.net-buttons": "^3.2.6",
     "datatables.net-buttons-dt": "^3.2.6",
     "formik": "^2.4.6",
+    "html5-qrcode": "^2.3.8",
     "jquery": "^4.0.0",
     "jspdf": "^4.1.0",
     "jspdf-autotable": "^5.0.7",

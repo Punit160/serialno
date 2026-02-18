@@ -1,12 +1,10 @@
 import { Fragment, useState, useRef, useEffect } from "react";
 import PageTitle from "../../layouts/PageTitle";
 import axios from "axios";
-import jsQR from "jsqr";
+import { Html5Qrcode } from "html5-qrcode";
 
 const DispatchPanel = () => {
-  const videoRef = useRef(null);
-  const canvasRef = useRef(null);
-  const streamRef = useRef(null);
+  const scannerRef = useRef(null);
 
   const [scanning, setScanning] = useState(false);
   const [dispatchStarted, setDispatchStarted] = useState(false);
@@ -44,92 +42,74 @@ const DispatchPanel = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(dispatchData));
   }, [dispatchData]);
 
-  /* CLEAN CAMERA */
+  /* STOP SCANNER ON UNMOUNT */
   useEffect(() => {
     return () => stopScan();
   }, []);
 
-  /* START SCAN */
+  /* START SCANNER */
   const startScan = async () => {
-    if (!scanning) {
+    if (!dispatchStarted) return;
+
+    setScanning(true);
+
+    const html5QrCode = new Html5Qrcode("reader");
+    scannerRef.current = html5QrCode;
+
+    try {
+      await html5QrCode.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: 250 },
+        (decodedText) => {
+          setManualPanel(decodedText);
+          savePanel(decodedText);
+          stopScan();
+        },
+        () => {}
+      );
+    } catch (err) {
+      console.log(err);
+      alert("Camera start failed");
+      setScanning(false);
+    }
+  };
+
+  /* STOP SCANNER */
+  const stopScan = async () => {
+    if (scannerRef.current) {
       try {
-        setScanning(true);
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "environment" },
-        });
-
-        streamRef.current = stream;
-        videoRef.current.srcObject = stream;
-        videoRef.current.setAttribute("playsinline", true);
-        await videoRef.current.play();
-
-        requestAnimationFrame(scanFrame);
-      } catch (err) {
-        alert("Camera access denied");
-        setScanning(false);
-      }
+        await scannerRef.current.stop();
+        scannerRef.current.clear();
+      } catch {}
+      scannerRef.current = null;
     }
-  };
-
-  /* SCAN FRAME */
-  const scanFrame = () => {
-    if (!videoRef.current || videoRef.current.readyState !== 4) {
-      requestAnimationFrame(scanFrame);
-      return;
-    }
-
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-
-    canvas.width = videoRef.current.videoWidth;
-    canvas.height = videoRef.current.videoHeight;
-
-    ctx.drawImage(videoRef.current, 0, 0);
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const code = jsQR(imageData.data, canvas.width, canvas.height);
-
-    if (code) {
-      savePanel(code.data);
-      stopScan();
-    } else {
-      requestAnimationFrame(scanFrame);
-    }
-  };
-
-  /* STOP SCAN */
-  const stopScan = () => {
-    streamRef.current?.getTracks().forEach((track) => track.stop());
-    streamRef.current = null;
     setScanning(false);
   };
 
   /* SAVE PANEL */
   const savePanel = async (panelCode) => {
-    
-  console.log("Sending to backend:", {
-  panel_no: panelCode,
-  dispatch_id: localStorage.getItem("dispatch_main_id"),
-  panel_type: localStorage.getItem("dispatch_panel_type"),
-});
+    if (
+      dispatchData.dcrPanels.includes(panelCode) ||
+      dispatchData.nonDcrPanels.includes(panelCode)
+    ) {
+      alert("Panel already scanned");
+      return;
+    }
 
     try {
       const token = localStorage.getItem("token");
       const dispatch_id = localStorage.getItem("dispatch_main_id");
       const panel_type = localStorage.getItem("dispatch_panel_type");
 
-      console.log("TOKEN:", localStorage.getItem("token"));
-
       await axios.post(
         `${import.meta.env.VITE_BACKEND_API_URL}dispatch/scan-panel`,
         {
           panel_no: panelCode,
           dispatch_id,
-          panel_type: panel_type,
+          panel_type,
         },
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
@@ -186,23 +166,16 @@ const DispatchPanel = () => {
         company_id,
       };
 
-     const res = await axios.post(
-  `${import.meta.env.VITE_BACKEND_API_URL}dispatch/create-dispatch-panel`,
-  payload,
-  {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  }
-);
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKEND_API_URL}dispatch/create-dispatch-panel`,
+        payload,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-     console.log("FULL RESPONSE:", res.data);
+      localStorage.setItem("dispatch_main_id", res.data.data.dispatch_id);
 
-          localStorage.setItem(
-      "dispatch_main_id",
-      res.data.data.dispatch_id
-    );
-      
       alert("Dispatch Started Successfully");
       setDispatchStarted(true);
     } catch (error) {
@@ -299,7 +272,6 @@ const DispatchPanel = () => {
                   <div className="d-flex justify-content-center gap-3">
                     {["DCR", "NON_DCR"].map((type) => {
                       const isActive = dispatchData.dispatchType === type;
-
                       return (
                         <label
                           key={type}
@@ -358,11 +330,7 @@ const DispatchPanel = () => {
 
                 {scanning && (
                   <div className="text-center mb-3">
-                    <video
-                      ref={videoRef}
-                      style={{ width: "100%", maxWidth: 350 }}
-                    />
-                    <canvas ref={canvasRef} style={{ display: "none" }} />
+                    <div id="reader" style={{ width: 320, margin: "auto" }} />
                   </div>
                 )}
 

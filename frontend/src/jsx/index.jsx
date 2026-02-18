@@ -15,6 +15,8 @@ import CardsCenter from "./components/Dashboard/CardsCenter";
 
 import Generatepanel from "./components/GeneratePanel/Generatepanel";
 import ViewGeneratePanel from "./components/GeneratePanel/ViewGeneratePanel";
+import ProductionForm from "./components/Production/ProductionForm";
+import ViewProduction from "./components/Production/ViewProduction";
 import DispatchPanel from "./components/DispatchPanel/DispatchPanel";
 import ViewDispatchPanel from "./components/DispatchPanel/ViewDispatch";
 import DamagePanel from "./components/DamagePanel/Damagepanel";
@@ -33,6 +35,9 @@ const Markup = () => {
 
     { url: "panel/generate", component: <Generatepanel /> },
     { url: "generate/panel/list", component: <ViewGeneratePanel /> },
+
+    { url: "production/add", component: <ProductionForm /> },
+    { url: "production/list", component: <ViewProduction /> },
 
     { url: "dispatch/create", component: <DispatchPanel /> },
     { url: "dispatch/list", component: <ViewDispatchPanel /> },
