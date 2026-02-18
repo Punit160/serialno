@@ -25,6 +25,8 @@ import AddUser from "./components/User/AddUser";
 import ViewUser from "./components/User/ViewUser";
 import ReceiveDamagedPanel from "./components/DamagePanel/ReceiveDamagedPanel";
 import LockScreen from "./pages/LockScreen";
+import EditUser from "./components/User/EditUser";
+import ViewSingleUser from "./components/User/ViewSingleUser";
 
 const Markup = () => {
   const allroutes = [
@@ -48,6 +50,8 @@ const Markup = () => {
 
     { url: "user/add", component: <AddUser /> },
     { url: "user/list", component: <ViewUser /> },
+    { url: "user/edit/:id", component: <EditUser /> },
+    { url: "user/view/:id", component: <ViewSingleUser /> }
   ];
 
   return (
