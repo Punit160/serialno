@@ -15,8 +15,16 @@ import LogoutPage from './Logout';
 import { ThemeContext } from "../../../context/ThemeContext";
 
 const Header = ({ onNote }) => {
-  var path = window.location.pathname.split("/");
-  var name = path[path.length - 1].split("-");
+var path = window.location.pathname.split("/").filter(Boolean);
+
+var lastSegment = path[path.length - 1];
+
+var isMongoId = /^[0-9a-fA-F]{24}$/.test(lastSegment);
+
+var segment = isMongoId ? path[path.length - 2] : lastSegment;
+
+var name = segment ? segment.split("-") : [];
+
   var filterName = name.length >= 3 ? name.filter((n, i) => i > 0) : name;
   var finalName = filterName.includes("app")
     ? filterName.filter((f) => f !== "app")
@@ -347,7 +355,14 @@ const Header = ({ onNote }) => {
                   role="button"
                   data-toggle="dropdown"
                 >
-                  <img src={profile} width={50} alt="" className="bg-light" />
+                  <img
+                    src={profile}
+                    width="50"
+                    height="50"
+                    alt="profile"
+                    className="rounded-circle object-fit-cover"
+                  />
+
 
                 </Dropdown.Toggle>
 
@@ -371,7 +386,7 @@ const Header = ({ onNote }) => {
                     </svg>
                     <span className="ms-2">Profile </span>
                   </Link>
-                
+
                   <LogoutPage />
 
                 </Dropdown.Menu>

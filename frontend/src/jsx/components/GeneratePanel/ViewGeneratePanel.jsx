@@ -99,7 +99,12 @@ const ViewGeneratePanel = () => {
                                                 >
                                                     <i className="fa fa-pencil" />
                                                 </Link>
-
+                                                <Link
+                                                    to={`/view-panel-details/${item._id}`}
+                                                    className="btn btn-info btn-xs sharp"
+                                                    >
+                                                    <i className="fa fa-eye" />
+                                                    </Link>
                                                 <button
                                                     className="btn btn-danger btn-xs sharp"
                                                     onClick={() => console.log(item._id)}
