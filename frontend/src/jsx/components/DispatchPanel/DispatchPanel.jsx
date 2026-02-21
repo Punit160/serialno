@@ -10,6 +10,8 @@ const DispatchPanel = () => {
   const [dispatchStarted, setDispatchStarted] = useState(false);
   const [manualPanel, setManualPanel] = useState("");
   const [scannerInput, setScannerInput] = useState("");
+  const scanTimeoutRef = useRef(null);
+
 
   const STORAGE_KEY = "dispatchPanelData";
 
@@ -309,22 +311,34 @@ const DispatchPanel = () => {
 
                 <div className="text-center row mb-3">
                 <div className="col-md-4 justify-content-center">
-                    <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Scan panel with scanner"
-                  style={{ maxWidth: "250px" }}
-                  value={scannerInput}
-                  onChange={(e) => setScannerInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      handleScannerInput(scannerInput.trim());
-                      setScannerInput("");
-                    }
-                  }}
-                  disabled={!dispatchStarted}
-                />
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Scan panel with scanner"
+                    style={{ maxWidth: "250px" }}
+                    value={scannerInput}
+                    autoFocus
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setScannerInput(value);
+
+                      // clear previous timer
+                      if (scanTimeoutRef.current) {
+                        clearTimeout(scanTimeoutRef.current);
+                      }
+
+                      // wait for scanner to finish typing
+                      scanTimeoutRef.current = setTimeout(() => {
+                        if (value.trim()) {
+                          handleScannerInput(value.trim());
+                          setScannerInput("");
+                        }
+                      }, 300); // adjust if needed
+                    }}
+                    disabled={!dispatchStarted}
+                  />
                 </div>
+
 
                 <div className="col-md-4">
                   <button
