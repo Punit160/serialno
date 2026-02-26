@@ -139,4 +139,23 @@ export const MenuList = [
 
 
 
+    // Settings Panel
+{
+    title: 'Settings',
+    classsChange: 'mm-collapse',
+    iconStyle: <i className="fa-solid fa-gear fw-bold" />,
+    content: [
+        {
+            title: 'Role Permission',
+            to: 'settings/role-permission',
+        },
+        {
+            title: 'General Settings',
+            to: 'settings/general',
+        },
+    ],
+},
+
+
+
 ]
