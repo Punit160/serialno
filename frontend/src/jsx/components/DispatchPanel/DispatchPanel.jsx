@@ -66,7 +66,7 @@ const DispatchPanel = () => {
         (decodedText) => {
           savePanel(decodedText);
         },
-        () => {}
+        () => { }
       );
     } catch (err) {
       console.log("Camera start failed:", err);
@@ -80,7 +80,7 @@ const DispatchPanel = () => {
       try {
         await scannerRef.current.stop();
         scannerRef.current.clear();
-      } catch {}
+      } catch { }
       scannerRef.current = null;
     }
     setScanning(false);
@@ -206,7 +206,7 @@ const DispatchPanel = () => {
     localStorage.removeItem("dispatch_panel_type");
     localStorage.removeItem("dispatchPanelData");
 
-    window.location.href = "/view-dispatch";
+    window.location.href = "/dispatch/list";
   };
 
   return (
@@ -293,11 +293,10 @@ const DispatchPanel = () => {
                       return (
                         <label
                           key={type}
-                          className={`btn ${
-                            isActive
+                          className={`btn ${isActive
                               ? "btn-outline-success"
                               : "btn-outline-danger"
-                          }`}
+                            }`}
                           style={{ width: "150px" }}
                         >
                           <input

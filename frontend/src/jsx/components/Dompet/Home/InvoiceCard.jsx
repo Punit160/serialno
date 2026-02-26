@@ -160,4 +160,3 @@ const InvoiceCard = () => {
 	)
 }
 export default InvoiceCard;
-
