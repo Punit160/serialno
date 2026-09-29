@@ -1,12 +1,13 @@
 import { Card, Table, Modal, Button } from "react-bootstrap";
 import TableExportActions from "../Common/TableExportActions";
 import CommonPagination from "../Common/Pagination";
-import Search, { useSearch } from "../Common/Search";
+import Search from "../Common/Search";
+import { useSearch } from "../Common/useSearch";
 import PageHeader from "../Common/PageHeader";
 import ListToolbar from "../Common/ListToolbar";
 import { ViewAction, AddAction, ExportAction } from "../Common/ActionButtons";
 import PrefixCell from "../Common/PrefixCell";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
@@ -51,11 +52,11 @@ const ViewProduction = () => {
   // ─────────────────────────────────────────────────────────────────────────
 
   // ── Fetch manufactured count for a single production id ─────────────────
-  const fetchManufacturedCount = async (id) => {
+  const fetchManufacturedCount = useCallback(async (prodId) => {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(
-        `${import.meta.env.VITE_BACKEND_API_URL}production/all-manufacturing-panels/${id}`,
+        `${import.meta.env.VITE_BACKEND_API_URL}production/all-manufacturing-panels/${prodId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const entries = res.data.data || [];
@@ -64,16 +65,16 @@ const ViewProduction = () => {
         (sum, entry) => sum + (Number(entry.panel_count) || 0),
         0
       );
-      setManufacturedCounts((prev) => ({ ...prev, [id]: total }));
+      setManufacturedCounts((prev) => ({ ...prev, [prodId]: total }));
     } catch {
-      setManufacturedCounts((prev) => ({ ...prev, [id]: 0 }));
+      setManufacturedCounts((prev) => ({ ...prev, [prodId]: 0 }));
     }
-  };
+  }, []);
 
   // ── Fetch counts for all productions after list loads ───────────────────
-  const fetchAllManufacturedCounts = async (list) => {
+  const fetchAllManufacturedCounts = useCallback(async (list) => {
     await Promise.all(list.map((item) => fetchManufacturedCount(item._id)));
-  };
+  }, [fetchManufacturedCount]);
 
   const handleModalOpen = (id) => {
     setSelectedProductionId(id);
@@ -127,7 +128,7 @@ const ViewProduction = () => {
     }
   };
 
-  const fetchProduction = async () => {
+  const fetchProduction = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(
@@ -140,13 +141,13 @@ const ViewProduction = () => {
       // ── Fetch manufactured counts for all rows ─────────────────────────
       fetchAllManufacturedCounts(list);
     } catch (err) {
-      console.log("API ERROR:", err);
+      console.error("API ERROR:", err);
     }
-  };
-  
+  }, [fetchAllManufacturedCounts]);
+
   useEffect(() => {
     fetchProduction();
-  }, []);
+  }, [fetchProduction]);
 
   // EXPORT
   const exportData = productionList.map((item, index) => ({

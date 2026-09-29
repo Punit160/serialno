@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, Col, Table, Modal } from "react-bootstrap";
-import Search, { useSearch } from "../Common/Search";
+import Search from "../Common/Search";
+import { useSearch } from "../Common/useSearch";
 import CommonPagination from "../Common/Pagination";
 import TableExportActions from "../Common/TableExportActions";
 import PageHeader from "../Common/PageHeader";

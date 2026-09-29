@@ -2,9 +2,6 @@ import jwt from "jsonwebtoken";
 
 export const auth = (req, res, next) => {
   try {
-    console.log("JWT_SECRET in middleware:", process.env.JWT_SECRET);
-    console.log("Headers received:", req.headers);
-
     const bearerHeader = req.headers.authorization;
     if (!bearerHeader) return res.status(401).json({ message: "No token Provided" });
 
@@ -13,11 +10,10 @@ export const auth = (req, res, next) => {
 
     const token = bearerHeader.split(" ")[1];
     const user = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("Decoded token:", user);
     req.user = user;
     next();
   } catch (err) {
-    console.log("JWT verify error:", err);
+    console.error("JWT verify error:", err.message);
     res.status(403).json({ message: "Invalid or expired Token" });
   }
 };

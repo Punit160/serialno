@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Card, Col, Table, Badge } from "react-bootstrap";
 import { useParams, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import TableExportActions from "../Common/TableExportActions";
 import CommonPagination from "../Common/Pagination";
-import Search, { useSearch } from "../Common/Search";
+import Search from "../Common/Search";
+import { useSearch } from "../Common/useSearch";
 import PageHeader from "../Common/PageHeader";
 import ListToolbar from "../Common/ListToolbar";
 import PrefixCell from "../Common/PrefixCell";
@@ -33,11 +34,7 @@ const ViewProductionPanels = () => {
   } = useSearch(panelList, SEARCH_KEYS, 100);
   // ─────────────────────────────────────────────────────────────────────────
 
-  useEffect(() => {
-    if (id) fetchPanels();
-  }, [id, isVendorView]);
-
-  const fetchPanels = async () => {
+  const fetchPanels = useCallback(async () => {
     try {
       setLoading(true);
       const endpoint = isVendorView
@@ -50,12 +47,16 @@ const ViewProductionPanels = () => {
       );
       setPanelList(res?.data?.data || []);
     } catch (err) {
-      console.log("Production Fetch Error:", err);
+      console.error("Production Fetch Error:", err);
       setError("Failed to fetch production panels");
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, isVendorView, token]);
+
+  useEffect(() => {
+    if (id) fetchPanels();
+  }, [id, fetchPanels]);
 
   // EXPORT DATA
   const exportData = panelList.map((item, index) => ({

@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect } from 'react';
 import Index from './jsx/index';
 import { useDispatch } from 'react-redux';
-import { Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import { checkAutoLogin } from './services/AuthService';
 import './assets/vendor/swiper/css/swiper-bundle.min.css';
 import "./assets/css/style.css";
@@ -11,22 +11,6 @@ import { ToastContainer } from "react-toastify";
 
 const Login = lazy(() => import('./jsx/pages/Login.jsx'));
 const SignUp = lazy(() => import('./jsx/pages/Registration.jsx'));
-
-function withRouter(Component) {
-    function ComponentWithRouterProp(props) {
-        let location = useLocation();
-        let navigate = useNavigate();
-        let params = useParams();
-
-        return (
-            <Component
-                {...props}
-                router={{ location, navigate, params }}
-            />
-        );
-    }
-    return ComponentWithRouterProp;
-}
 
 function App() {
     const dispatch = useDispatch();
@@ -61,4 +45,4 @@ function App() {
     );
 }
 
-export default withRouter(App);
+export default App;

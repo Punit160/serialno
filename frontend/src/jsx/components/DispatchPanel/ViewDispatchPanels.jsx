@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Card, Col, Row, Table, Badge, Button } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import axios from "axios";
@@ -6,7 +6,8 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import TableExportActions from "../Common/TableExportActions";
 import CommonPagination from "../Common/Pagination";
-import Search, { useSearch } from "../Common/Search";
+import Search from "../Common/Search";
+import { useSearch } from "../Common/useSearch";
 import PageHeader from "../Common/PageHeader";
 import ListToolbar from "../Common/ListToolbar";
 import PrefixCell from "../Common/PrefixCell";
@@ -26,11 +27,7 @@ const ViewDispatchPanels = () => {
 
   /* ================= FETCH ================= */
 
-  useEffect(() => {
-    if (id) fetchPanels();
-  }, [id]);
-
-  const fetchPanels = async () => {
+  const fetchPanels = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -48,7 +45,11 @@ const ViewDispatchPanels = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, token]);
+
+  useEffect(() => {
+    if (id) fetchPanels();
+  }, [id, fetchPanels]);
 
   /* ================= DELETE ================= */
 

@@ -1,5 +1,6 @@
 import {
   Fragment,
+  useCallback,
   useEffect,
   useState,
 } from "react";
@@ -73,121 +74,59 @@ const EditUser = () => {
   // =========================================
   // FETCH ROLES
   // =========================================
-  const fetchRoles = async () => {
-
+  const fetchRoles = useCallback(async () => {
     try {
-
       setRolesLoading(true);
 
       const res = await getRoles();
 
-      console.log(
-        "Roles Response:",
-        res.data
-      );
-
-      setRolesList(
-        res?.data?.data || []
-      );
-
+      setRolesList(res?.data?.data || []);
     } catch (err) {
-
-      console.log(
-        "Role fetch error:",
-        err
-      );
-
+      console.error("Role fetch error:", err);
       setRolesList([]);
-
     } finally {
-
       setRolesLoading(false);
-
     }
-  };
+  }, []);
 
   // =========================================
   // FETCH USER DATA
   // =========================================
-  const loadUser = async () => {
-
+  const loadUser = useCallback(async () => {
     try {
-
       setUserLoading(true);
 
-      const userRes =
-        await getUserById(id);
+      const userRes = await getUserById(id);
 
-      console.log(
-        "User Response:",
-        userRes.data
-      );
-
-      const user =
-        userRes?.data?.data ||
-        userRes?.data ||
-        {};
+      const user = userRes?.data?.data || userRes?.data || {};
 
       setFormData({
-        first_name:
-          user.first_name || "",
-
-        last_name:
-          user.last_name || "",
-
-        email:
-          user.email || "",
-
-        whatsapp_no:
-          user.whatsapp_no || "",
-
-        gender:
-          user.gender || "",
-
-        role:
-          user.role?._id ||
-          user.role ||
-          "",
-
-        city:
-          user.city || "",
-
-        project:
-          user.project || "",
-
+        first_name: user.first_name || "",
+        last_name: user.last_name || "",
+        email: user.email || "",
+        whatsapp_no: user.whatsapp_no || "",
+        gender: user.gender || "",
+        role: user.role?._id || user.role || "",
+        city: user.city || "",
+        project: user.project || "",
         password: "",
-
         emp_image: null,
       });
-
     } catch (err) {
-
-      console.log(
-        "User Fetch Error:",
-        err
-      );
-
-      alert(
-        "Failed to load user details"
-      );
-
+      console.error("User Fetch Error:", err);
+      alert("Failed to load user details");
     } finally {
-
       setUserLoading(false);
-
     }
-  };
+  }, [id]);
 
   // =========================================
   // USE EFFECT
   // =========================================
   useEffect(() => {
-
     loadUser();
-
     fetchRoles();
-
-  }, [id]);
+  }, [loadUser, fetchRoles]);
 
   // =========================================
   // HANDLE CHANGE

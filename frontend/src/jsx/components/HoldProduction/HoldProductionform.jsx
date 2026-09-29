@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import PageTitle from "../../layouts/PageTitle";
 import FormSubmitButton from "../Common/FormSubmitButton";
@@ -27,95 +27,7 @@ const HoldProductionform = () => {
   useState("");
   const [loading, setLoading] = useState(false);
 
-  // ===========================
-  // Load Capacities
-  // ===========================
-  useEffect(() => {
-    fetchCapacities();
-  }, []);
-
-  // ===========================
-  // Capacity -> Years
-  // ===========================
-  useEffect(() => {
-    if (formData.panel_capacity) {
-      fetchYears();
-
-      setFormData((prev) => ({
-        ...prev,
-        generated_year: "",
-        prefix: "",
-        panel_type: "",
-        panel_count: "",
-      }));
-
-      setYears([]);
-      setPrefixes([]);
-      setPanelTypes([]);
-      setAvailableCount(0);
-    }
-  }, [formData.panel_capacity]);
-
-  // ===========================
-  // Year -> Prefix
-  // ===========================
-  useEffect(() => {
-    if (
-      formData.panel_capacity &&
-      formData.generated_year
-    ) {
-      fetchPrefixes();
-
-      setFormData((prev) => ({
-        ...prev,
-        prefix: "",
-        panel_type: "",
-        panel_count: "",
-      }));
-
-      setPrefixes([]);
-      setPanelTypes([]);
-      setAvailableCount(0);
-    }
-  }, [formData.generated_year]);
-
-  // ===========================
-  // Prefix -> Panel Types
-  // ===========================
-  useEffect(() => {
-    if (
-      formData.panel_capacity &&
-      formData.generated_year &&
-      formData.prefix
-    ) {
-      fetchPanelTypes();
-
-      setFormData((prev) => ({
-        ...prev,
-        panel_type: "",
-        panel_count: "",
-      }));
-
-      setPanelTypes([]);
-      setAvailableCount(0);
-    }
-  }, [formData.prefix]);
-
-  // ===========================
-  // Panel Type -> Count
-  // ===========================
-  useEffect(() => {
-    if (
-      formData.panel_capacity &&
-      formData.generated_year &&
-      formData.prefix &&
-      formData.panel_type
-    ) {
-      fetchAvailableCount();
-    }
-  }, [formData.panel_type]);
-
-  const fetchCapacities = async () => {
+  const fetchCapacities = useCallback(async () => {
     try {
       const response = await axios.get(
         `${BASE_URL}holdpanel/hold-capacity`,
@@ -130,9 +42,9 @@ const HoldProductionform = () => {
     } catch (error) {
       console.error(error);
     }
-  };
+  }, [BASE_URL, token]);
 
-  const fetchYears = async () => {
+  const fetchYears = useCallback(async () => {
     try {
       const response = await axios.get(
         `${BASE_URL}holdpanel/generated-year?panel_capacity=${formData.panel_capacity}`,
@@ -147,9 +59,9 @@ const HoldProductionform = () => {
     } catch (error) {
       console.error(error);
     }
-  };
+  }, [BASE_URL, token, formData.panel_capacity]);
 
-  const fetchPrefixes = async () => {
+  const fetchPrefixes = useCallback(async () => {
     try {
       const response = await axios.get(
         `${BASE_URL}holdpanel/company-prefix?panel_capacity=${formData.panel_capacity}&generated_year=${formData.generated_year}`,
@@ -164,9 +76,9 @@ const HoldProductionform = () => {
     } catch (error) {
       console.error(error);
     }
-  };
+  }, [BASE_URL, token, formData.panel_capacity, formData.generated_year]);
 
-  const fetchPanelTypes = async () => {
+  const fetchPanelTypes = useCallback(async () => {
     try {
       const response = await axios.get(
         `${BASE_URL}holdpanel/panel-type?panel_capacity=${formData.panel_capacity}&generated_year=${formData.generated_year}&prefix=${formData.prefix}`,
@@ -181,9 +93,9 @@ const HoldProductionform = () => {
     } catch (error) {
       console.error(error);
     }
-  };
+  }, [BASE_URL, token, formData.panel_capacity, formData.generated_year, formData.prefix]);
 
-const fetchAvailableCount = async () => {
+  const fetchAvailableCount = useCallback(async () => {
   try {
     const response = await axios.get(
       `${BASE_URL}holdpanel/available-count?panel_capacity=${formData.panel_capacity}&generated_year=${formData.generated_year}&prefix=${formData.prefix}&panel_type=${formData.panel_type}`,
@@ -212,7 +124,110 @@ const fetchAvailableCount = async () => {
     setStartingPanelNo("");
     setStartingPanelUniqueNo("");
   }
-};
+  }, [
+    BASE_URL,
+    token,
+    formData.panel_capacity,
+    formData.generated_year,
+    formData.prefix,
+    formData.panel_type,
+  ]);
+
+  // ===========================
+  // Load Capacities
+  // ===========================
+  useEffect(() => {
+    fetchCapacities();
+  }, [fetchCapacities]);
+
+  // ===========================
+  // Capacity -> Years
+  // ===========================
+  useEffect(() => {
+    if (formData.panel_capacity) {
+      fetchYears();
+
+      setFormData((prev) => ({
+        ...prev,
+        generated_year: "",
+        prefix: "",
+        panel_type: "",
+        panel_count: "",
+      }));
+
+      setYears([]);
+      setPrefixes([]);
+      setPanelTypes([]);
+      setAvailableCount(0);
+    }
+  }, [formData.panel_capacity, fetchYears]);
+
+  // ===========================
+  // Year -> Prefix
+  // ===========================
+  useEffect(() => {
+    if (formData.panel_capacity && formData.generated_year) {
+      fetchPrefixes();
+
+      setFormData((prev) => ({
+        ...prev,
+        prefix: "",
+        panel_type: "",
+        panel_count: "",
+      }));
+
+      setPrefixes([]);
+      setPanelTypes([]);
+      setAvailableCount(0);
+    }
+  }, [formData.generated_year, formData.panel_capacity, fetchPrefixes]);
+
+  // ===========================
+  // Prefix -> Panel Types
+  // ===========================
+  useEffect(() => {
+    if (
+      formData.panel_capacity &&
+      formData.generated_year &&
+      formData.prefix
+    ) {
+      fetchPanelTypes();
+
+      setFormData((prev) => ({
+        ...prev,
+        panel_type: "",
+        panel_count: "",
+      }));
+
+      setPanelTypes([]);
+      setAvailableCount(0);
+    }
+  }, [
+    formData.prefix,
+    formData.panel_capacity,
+    formData.generated_year,
+    fetchPanelTypes,
+  ]);
+
+  // ===========================
+  // Panel Type -> Count
+  // ===========================
+  useEffect(() => {
+    if (
+      formData.panel_capacity &&
+      formData.generated_year &&
+      formData.prefix &&
+      formData.panel_type
+    ) {
+      fetchAvailableCount();
+    }
+  }, [
+    formData.panel_type,
+    formData.panel_capacity,
+    formData.generated_year,
+    formData.prefix,
+    fetchAvailableCount,
+  ]);
 
   const handleChange = (e) => {
     setFormData((prev) => ({

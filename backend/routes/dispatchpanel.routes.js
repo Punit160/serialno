@@ -3,8 +3,6 @@ import {createDispatch , getAllDispatches, getDispatchById, updateDispatch, dele
 
 const router = express.Router();
 
-console.log("scanPanel:", scanPanel);
-
 router.post("/create-dispatch-panel", createDispatch);
 router.get("/fetch-all-dispatch-panel", getAllDispatches);
 router.get("/fetch-dispatch-panel/:id", getDispatchById);

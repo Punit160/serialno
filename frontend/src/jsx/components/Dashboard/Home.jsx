@@ -3,7 +3,7 @@ import { useContext, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import loadable from "@loadable/component";
 import pMinDelay from "p-min-delay";
-import { ThemeContext } from "../../../context/ThemeContext";
+import { ThemeContext } from "../../../context/appThemeContext.js";
 import { PageLoader, ErrorState } from "../Common/LoadingState";
 import PageHeader from "../Common/PageHeader";
 import DashboardStatCard from "./DashboardStatCard";

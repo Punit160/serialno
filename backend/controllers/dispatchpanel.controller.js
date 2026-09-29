@@ -100,18 +100,62 @@ export const getDispatchById = async (req, res) => {
 // ✅ UPDATE DISPATCH
 export const updateDispatch = async (req, res) => {
   try {
-    const dispatch = await DispatchPanel.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    );
+    const existing = await DispatchPanel.findById(req.params.id);
 
-    if (!dispatch) {
+    if (!existing) {
       return res.status(404).json({
         success: false,
         message: "Dispatch not found",
       });
     }
+
+    const allowed = [
+      "dispatch_id",
+      "state",
+      "truck_no",
+      "driver_no",
+      "driver_name",
+      "challan_no",
+      "dispatch_panel_count",
+    ];
+
+    const updates = {};
+    for (const key of allowed) {
+      if (req.body[key] !== undefined && req.body[key] !== null) {
+        updates[key] = req.body[key];
+      }
+    }
+
+    if (updates.dispatch_panel_count !== undefined) {
+      updates.dispatch_panel_count = Number(updates.dispatch_panel_count);
+      if (
+        Number.isNaN(updates.dispatch_panel_count) ||
+        updates.dispatch_panel_count < 0
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: "Dispatch panel count must be a valid non-negative number",
+        });
+      }
+
+      const scannedCount = await PanelNumber.countDocuments({
+        dispatch_id: existing._id,
+        dispatch_status: 1,
+      });
+
+      if (updates.dispatch_panel_count < scannedCount) {
+        return res.status(400).json({
+          success: false,
+          message: `Panel count cannot be less than already scanned panels (${scannedCount})`,
+        });
+      }
+    }
+
+    const dispatch = await DispatchPanel.findByIdAndUpdate(
+      req.params.id,
+      updates,
+      { new: true, runValidators: true }
+    );
 
     res.status(200).json({
       success: true,
@@ -119,6 +163,12 @@ export const updateDispatch = async (req, res) => {
       data: dispatch,
     });
   } catch (error) {
+    if (error?.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: "Dispatch ID or Challan No already exists",
+      });
+    }
     res.status(500).json({
       success: false,
       message: error.message,
@@ -184,8 +234,14 @@ export const scanPanel = async (req, res) => {
 
 
     if (panel.dispatch_status === 1) {
+      if (String(panel.dispatch_id) === String(dispatch_id)) {
+        return res.json({
+          message: "Panel already on this dispatch",
+          panel_no,
+        });
+      }
       return res.status(400).json({
-        message: "Panel already dispatched",
+        message: "Panel already dispatched on another truck",
       });
     }
     const dispatch = await DispatchPanel.findById(dispatch_id);

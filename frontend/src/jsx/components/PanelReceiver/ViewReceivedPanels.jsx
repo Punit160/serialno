@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Card, Col, Table, Badge } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import axios from "axios";
@@ -13,13 +13,7 @@ const ViewReceivedPanels = () => {
 
   const token = localStorage.getItem("token");
 
-  useEffect(() => {
-    if (id) {
-      fetchPanels();
-    }
-  }, [id]);
-
-  const fetchPanels = async () => {
+  const fetchPanels = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
@@ -56,7 +50,13 @@ const ViewReceivedPanels = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, token]);
+
+  useEffect(() => {
+    if (id) {
+      fetchPanels();
+    }
+  }, [id, fetchPanels]);
 
   return (
     <>

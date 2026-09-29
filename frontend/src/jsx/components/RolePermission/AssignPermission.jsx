@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useEffect,
   useMemo,
   useState,
@@ -47,92 +48,61 @@ const PermissionPopup = ({
   // =========================================
   // FETCH PERMISSIONS
   // =========================================
-  const fetchPermissions =
-    async () => {
+  const fetchPermissions = useCallback(async () => {
+    try {
+      setLoading(true);
 
-      try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_API_URL}role/permissions`,
+        {
+          headers: authHeader(),
+        }
+      );
 
-        setLoading(true);
-
-        const response =
-          await axios.get(
-            `${import.meta.env.VITE_BACKEND_API_URL}role/permissions`,
-            {
-              headers: authHeader(),
-            }
-          );
-
-        setPermissions(
-          response?.data?.data || []
-        );
-
-      } catch (error) {
-
-        console.log(
-          "Fetch Permission Error:",
-          error
-        );
-
-      } finally {
-
-        setLoading(false);
-
-      }
-    };
+      setPermissions(response?.data?.data || []);
+    } catch (error) {
+      console.error("Fetch Permission Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   // =========================================
   // FETCH ASSIGNED PERMISSIONS
   // =========================================
-  const fetchRolePermissions =
-    async () => {
+  const fetchRolePermissions = useCallback(async () => {
+    try {
+      if (!role?._id) return;
 
-      try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_API_URL}role/role-permission/role/${role._id}`,
+        {
+          headers: authHeader(),
+        }
+      );
 
-        if (!role?._id) return;
+      const assigned = response?.data?.data || [];
 
-        const response =
-          await axios.get(
-            `${import.meta.env.VITE_BACKEND_API_URL}role/role-permission/role/${role._id}`,
-            {
-              headers: authHeader(),
-            }
-          );
+      const ids = assigned.map(
+        (item) => item.permission_id?._id || item.permission_id
+      );
 
-        const assigned =
-          response?.data?.data || [];
-
-        const ids = assigned.map(
-          (item) =>
-            item.permission_id?._id ||
-            item.permission_id
-        );
-
-        setSelectedPermissions(ids);
-
-      } catch (error) {
-
-        console.log(
-          "Fetch Role Permission Error:",
-          error
-        );
-      }
-    };
+      setSelectedPermissions(ids);
+    } catch (error) {
+      console.error("Fetch Role Permission Error:", error);
+    }
+  }, [role?._id]);
 
   // =========================================
   // USE EFFECT
   // =========================================
   useEffect(() => {
-
     if (show) {
-
       fetchPermissions();
-
       fetchRolePermissions();
-
       setSaved(false);
     }
-
-  }, [show, role]);
+  }, [show, role, fetchPermissions, fetchRolePermissions]);
 
   // =========================================
   // FILTER + GROUP MODULE

@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Card, Col, Table, Badge, Spinner } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { getPanelDetailsByLot } from "./GeneratepanelApis";
 import TableExportActions from "../Common/TableExportActions";
 import CommonPagination from "../Common/Pagination";
-import Search, { useSearch } from "../Common/Search";
+import Search from "../Common/Search";
+import { useSearch } from "../Common/useSearch";
 import PageHeader from "../Common/PageHeader";
 import ListToolbar from "../Common/ListToolbar";
 import PrefixCell from "../Common/PrefixCell";
@@ -15,20 +16,20 @@ const ViewPanelDetails = () => {
   const [panelList, setPanelList] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchPanels();
-  }, []);
-
-  const fetchPanels = async () => {
+  const fetchPanels = useCallback(async () => {
     try {
       const res = await getPanelDetailsByLot(id);
       setPanelList(res?.data?.data || []);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    fetchPanels();
+  }, [fetchPanels]);
 
   // ── REPLACE old pagination block with useSearch ──────────────────────────
   const SEARCH_KEYS = ["panel_unique_no", "panel_capacity", "prefix"];

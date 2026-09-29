@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 
@@ -15,38 +15,38 @@ const ReleaseForm = ({ holdData, onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [range, setRange] = useState(null);
 
+  const fetchRange = useCallback(async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_API_URL}holdpanel/hold-details/${holdData._id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        setRange(response.data.data);
+      }
+    } catch (error) {
+      console.error("Range Fetch Error:", error);
+
+      Swal.fire(
+        "Error",
+        "Unable to fetch hold panel details",
+        "error"
+      );
+    }
+  }, [holdData?._id]);
+
   useEffect(() => {
     if (holdData?._id) {
       fetchRange();
     }
-  }, [holdData]);
-
- const fetchRange = async () => {
-  try {
-    const token = localStorage.getItem("token");
-
-    const response = await axios.get(
-      `${import.meta.env.VITE_BACKEND_API_URL}holdpanel/hold-details/${holdData._id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    if (response.data.success) {
-      setRange(response.data.data);
-    }
-  } catch (error) {
-    console.error("Range Fetch Error:", error);
-
-    Swal.fire(
-      "Error",
-      "Unable to fetch hold panel details",
-      "error"
-    );
-  }
-};
+  }, [holdData?._id, fetchRange]);
 
   const handleChange = (e) => {
     setFormData((prev) => ({

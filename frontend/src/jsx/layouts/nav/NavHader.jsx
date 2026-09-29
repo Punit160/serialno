@@ -1,7 +1,7 @@
 import { Fragment, useContext } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { ThemeContext } from "../../../context/ThemeContext";
+import { ThemeContext } from "../../../context/appThemeContext.js";
 import { navtoggle } from "../../../store/actions/AuthActions";
 import img from "../../../assets/images/logo.png";
 

@@ -1,7 +1,7 @@
-import { createContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
-export const ThemeContext = createContext();
+import { ThemeContext } from "./appThemeContext.js";
 
 const ThemeContextProvider = (props) => {
   const [sideBarStyle, setSideBarStyle] = useState({ value: "full", label: "Full", });

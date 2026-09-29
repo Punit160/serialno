@@ -12,7 +12,7 @@ import profile from "../../../assets/images/profile/profileimg3.jpg";
 import { Dropdown } from "react-bootstrap";
 import LogoutPage from './Logout';
 
-import { ThemeContext } from "../../../context/ThemeContext";
+import { ThemeContext } from "../../../context/appThemeContext.js";
 
 
 const baseURL = import.meta.env.VITE_BACKEND_URL;

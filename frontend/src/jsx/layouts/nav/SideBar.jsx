@@ -11,7 +11,7 @@ import {
   isMenuPathActive,
   isParentRouteActive,
 } from "./menuUtils";
-import { ThemeContext } from "../../../context/ThemeContext";
+import { ThemeContext } from "../../../context/appThemeContext.js";
 import { navtoggle } from "../../../store/actions/AuthActions";
 import LogoutPage from "./Logout";
 import profile from "../../../assets/images/profile/profileimg3.jpg";

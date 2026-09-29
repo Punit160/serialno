@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Card, Col, Table, Badge } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 
 import TableExportActions from "../Common/TableExportActions";
 import CommonPagination from "../Common/Pagination";
-import Search, { useSearch } from "../Common/Search";
+import Search from "../Common/Search";
+import { useSearch } from "../Common/useSearch";
 import PageHeader from "../Common/PageHeader";
 import ListToolbar from "../Common/ListToolbar";
 import PrefixCell from "../Common/PrefixCell";
@@ -16,36 +17,34 @@ const ViewHoldPanels = () => {
   const [panelList, setPanelList] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const fetchHoldPanels = async () => {
-  try {
-    setLoading(true);
+  const fetchHoldPanels = useCallback(async () => {
+    try {
+      setLoading(true);
 
-    const token = localStorage.getItem("token");
+      const token = localStorage.getItem("token");
 
-    const response = await axios.get(
-      `${import.meta.env.VITE_BACKEND_API_URL}holdpanel/hold-panel/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_API_URL}holdpanel/hold-panel/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        setPanelList(response.data.data || []);
       }
-    );
-
-    console.log("Response:", response.data);
-
-    if (response.data.success) {
-      setPanelList(response.data.data || []);
+    } catch (error) {
+      console.error("Fetch Error:", error);
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error("Fetch Error:", error);
-  } finally {
-    setLoading(false);
-  }
-};
+  }, [id]);
 
   useEffect(() => {
     fetchHoldPanels();
-  }, [id]);
+  }, [fetchHoldPanels]);
 
   const SEARCH_KEYS = [
     "panel_unique_no",

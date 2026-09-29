@@ -8,7 +8,8 @@ import { PageLoader } from "../Common/LoadingState";
 import { notifyError } from "../../utils/toast";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import Search, { useSearch } from "../Common/Search";
+import Search from "../Common/Search";
+import { useSearch } from "../Common/useSearch";
 import CommonPagination from "../Common/Pagination";
 import BreakdownChips from "../Common/BreakdownChips";
 

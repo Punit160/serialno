@@ -7,7 +7,7 @@ import Footer from "./layouts/Footer";
 import Setting from "./layouts/Setting";
 import ScrollToTop from './pages/ScrollToTop';
 
-import { ThemeContext } from "../context/ThemeContext";
+import { ThemeContext } from "../context/appThemeContext.js";
 
 import Home from "./components/Dashboard/Home";
 

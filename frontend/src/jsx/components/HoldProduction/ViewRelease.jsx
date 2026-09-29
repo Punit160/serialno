@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Table } from "react-bootstrap";
 import axios from "axios";
 import PrefixCell from "../Common/PrefixCell";
@@ -7,7 +7,7 @@ const ViewRelease = ({ holdData }) => {
   const [releaseList, setReleaseList] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const fetchReleaseHistory = async () => {
+  const fetchReleaseHistory = useCallback(async () => {
     try {
       if (!holdData?._id) return;
 
@@ -32,11 +32,11 @@ const ViewRelease = ({ holdData }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [holdData?._id]);
 
   useEffect(() => {
     fetchReleaseHistory();
-  }, [holdData]);
+  }, [fetchReleaseHistory]);
 
   return (
     <Table responsive hover>

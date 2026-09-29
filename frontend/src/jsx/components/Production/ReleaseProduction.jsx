@@ -1,4 +1,4 @@
-import { Fragment, useState, useEffect, useMemo } from "react";
+import { Fragment, useState, useEffect, useMemo, useCallback } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
 import { Badge } from "react-bootstrap";
@@ -30,24 +30,7 @@ const ReleaseProduction = ({ item, onClose }) => {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const created_by = user?.id || "";
 
-  useEffect(() => {
-    if (item?._id) {
-      fetchHistory();
-      fetchVendors();
-      fetchPanelList();
-      setCurrentPanels(item?.panel_count || 0);
-      setFormData({
-        new_vendor_id: "",
-        new_project: item?.project || "",
-        new_state: item?.state || "",
-        remark: "",
-      });
-      setStartPanelId("");
-      setEndPanelId("");
-    }
-  }, [item]);
-
-  const fetchVendors = async () => {
+  const fetchVendors = useCallback(async () => {
     try {
       const response = await fetch(
         `${import.meta.env.VITE_BACKEND_API_URL}users/vendor-list`,
@@ -63,11 +46,11 @@ const ReleaseProduction = ({ item, onClose }) => {
         console.log("Vendor fetch failed");
       }
     } catch (error) {
-      console.log("Vendor API Error:", error);
+      console.error("Vendor API Error:", error);
     }
-  };
+  }, [token]);
 
-  const fetchHistory = async () => {
+  const fetchHistory = useCallback(async () => {
     setHistoryLoading(true);
     try {
       const res = await axios.get(
@@ -81,9 +64,9 @@ const ReleaseProduction = ({ item, onClose }) => {
     } finally {
       setHistoryLoading(false);
     }
-  };
+  }, [token, item?._id]);
 
-  const fetchPanelList = async () => {
+  const fetchPanelList = useCallback(async () => {
     setPanelListLoading(true);
     try {
       const res = await axios.get(
@@ -97,12 +80,29 @@ const ReleaseProduction = ({ item, onClose }) => {
       );
       setPanelList(sorted);
     } catch (err) {
-      console.log("Panel List Fetch Error:", err);
+      console.error("Panel List Fetch Error:", err);
       setPanelList([]);
     } finally {
       setPanelListLoading(false);
     }
-  };
+  }, [token, item?._id]);
+
+  useEffect(() => {
+    if (item?._id) {
+      fetchHistory();
+      fetchVendors();
+      fetchPanelList();
+      setCurrentPanels(item?.panel_count || 0);
+      setFormData({
+        new_vendor_id: "",
+        new_project: item?.project || "",
+        new_state: item?.state || "",
+        remark: "",
+      });
+      setStartPanelId("");
+      setEndPanelId("");
+    }
+  }, [item, fetchHistory, fetchVendors, fetchPanelList]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
